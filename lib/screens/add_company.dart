@@ -94,13 +94,13 @@ class PersonalDetailsWidget extends StatelessWidget {
                   print(value);
                 },
               ),
-              CustomEditText(
-                label: "Designation",
-                width: width * 0.9,
-                onChange: (value) {
-                  print(value);
-                },
-              ),
+              // CustomEditText(
+              //   label: "Designation",
+              //   width: width * 0.9,
+              //   onChange: (value) {
+              //     print(value);
+              //   },
+              // ),
               Container(
                 width: width * 0.9,
                 height: 130,

@@ -15,7 +15,7 @@ const dashboardDetailsScreenRoute = "/dashboard";
 const addCompanyScreen = "Add Company";
 const addCompanyScreenRoute = "/add-company";
 
-const addManagerScreen = "Add Manager";
+const addManagerScreen = "Add User";
 const addManagerScreenRoute = "/add-manager";
 
 const addEmployerScreen = "Add Employer";
@@ -29,3 +29,6 @@ const addEmployeeOtherScreenRoute = "/add-employee-details-other";
 
 const notificationScreen = "Notification";
 const notificationScreenRoute = "/notification";
+
+const forgotPassScreen = "Forgot Password";
+const forgotPassScreenRoute = "/forgot-password";

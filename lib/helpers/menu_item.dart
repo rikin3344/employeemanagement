@@ -22,7 +22,7 @@ List<MenuItem> sideMenuItems = [
   MenuItem(addManagerScreenRoute, addManagerScreen, () {
     navigationController.navigateTO(addManagerScreenRoute);
   }),
-  MenuItem(addEmployerScreenRoute, addEmployerScreen, () {}),
+  // MenuItem(addEmployerScreenRoute, addEmployerScreen, () {}),
   MenuItem(addEmployeeScreenRoute, addEmployeeScreen, () {
     navigationController.navigateTO(addEmployeeScreenRoute);
   }),

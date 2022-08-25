@@ -5,6 +5,7 @@ import 'package:employeemanagement/screens/add_employee.dart';
 import 'package:employeemanagement/screens/add_employee_other_details.dart';
 import 'package:employeemanagement/screens/add_user.dart';
 import 'package:employeemanagement/screens/employee_details.dart';
+import 'package:employeemanagement/screens/forgot_password.dart';
 import 'package:employeemanagement/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -23,6 +24,8 @@ Route<dynamic> generateRoute(RouteSettings settings) {
       return _getPageRoute(const AddEmployee());
     case addEmployeeOtherScreenRoute:
       return _getPageRoute(const AddEmployeeOther());
+    case forgotPassScreenRoute:
+      return _getPageRoute(const ForgotPassword());
     case loginRoute:
       return _getPageRoute(const LoginScreen());
     default:

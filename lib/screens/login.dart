@@ -1,11 +1,19 @@
+import 'dart:io' show Platform;
+import 'package:http/http.dart' as http;
+
+import 'package:employeemanagement/constants/api_client.dart';
 import 'package:employeemanagement/constants/controllers.dart';
 import 'package:employeemanagement/constants/style.dart';
 import 'package:employeemanagement/controller/navigation_controller.dart';
+import 'package:employeemanagement/model/login_model.dart';
 import 'package:employeemanagement/routes/routes.dart';
+import 'package:employeemanagement/screens/forgot_password.dart';
 import 'package:employeemanagement/widgets/custom_edit_text.dart';
 import 'package:employeemanagement/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
+import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -16,6 +24,47 @@ class LoginScreen extends StatefulWidget {
 
 class _LoginScreenState extends State<LoginScreen> {
   bool isObscureText = true;
+  String email = '';
+  String password = '';
+
+  loginRequest(email, password, context) async {
+    loading.start(context);
+
+    String deviceToken = getRandomString(100);
+    String intudid = '123';
+    String deviceType = Platform.operatingSystem;
+    String appVersion = '1';
+
+    print("$deviceToken DT");
+    print("$deviceType DType");
+    print("$appVersion Version");
+
+    Map data = {
+      'email': email,
+      'password': password,
+      'device_token': deviceToken,
+      'intudid': intudid,
+      'device_type': 'Android',
+      'app_version': appVersion
+    };
+    var url = Uri.parse("${APiConst.baseUrl}login");
+    var response = await http.post(url,
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
+        },
+        body: data);
+
+    if (response.statusCode == 200) {
+      LoginModel model = loginModelFromJson(response.body);
+      print(model.success);
+      loading.stopDialog(context);
+    } else {
+      print(response.statusCode);
+      loading.stopDialog(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -23,11 +72,11 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       body: Container(
         width: width,
-        child: Column(
-          children: [
-            Expanded(
-              flex: 1,
-              child: Container(
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                height: height / 2,
                 child: Stack(
                   children: [
                     Positioned(
@@ -56,10 +105,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
               ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Container(
+              Container(
                 child: Column(
                   children: [
                     Container(
@@ -77,9 +123,13 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: Column(
                         children: [
                           CustomEditText(
-                            label: 'Email / Mobile',
+                            label: 'Email',
                             width: width * 0.8,
-                            onChange: (value) {},
+                            onChange: (value) {
+                              setState(() {
+                                email = value;
+                              });
+                            },
                           ),
                           Container(
                             margin: const EdgeInsets.only(bottom: 10.0),
@@ -88,6 +138,11 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: TextFormField(
                               obscureText: isObscureText,
                               cursorColor: colorSecondary,
+                              onChanged: (value) {
+                                setState(() {
+                                  password = value;
+                                });
+                              },
                               decoration: InputDecoration(
                                   labelText: 'Password',
                                   focusedBorder: const OutlineInputBorder(
@@ -137,7 +192,13 @@ class _LoginScreenState extends State<LoginScreen> {
                                   )),
                               clipBehavior: Clip.antiAliasWithSaveLayer,
                               onPressed: () {
-                                Get.offAllNamed(homeRoute);
+                                if (email == '' || password == '') {
+                                  Get.snackbar(
+                                      "Required", "Details can't be Blank!");
+                                } else {
+                                  loginRequest(email, password, context);
+                                }
+                                // Get.offAllNamed(homeRoute);
                               },
                               child: const Icon(
                                 Icons.arrow_forward_ios_rounded,
@@ -153,27 +214,34 @@ class _LoginScreenState extends State<LoginScreen> {
                       margin: const EdgeInsets.only(top: 30),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: const [
-                          CustomText(
+                        children: [
+                          const CustomText(
                             text: 'Sign Up',
                             size: 16,
                             isUnderline: true,
                             fontfamily: 'semiBold',
                           ),
-                          CustomText(
-                            text: 'Forgot Password?',
-                            size: 16,
-                            isUnderline: true,
-                            fontfamily: 'semiBold',
+                          InkWell(
+                            onTap: () {
+                              // navigationController
+                              //     .navigateTO(forgotPassScreenRoute);
+                              Get.to(const ForgotPassword());
+                            },
+                            child: const CustomText(
+                              text: 'Forgot Password?',
+                              size: 16,
+                              isUnderline: true,
+                              fontfamily: 'semiBold',
+                            ),
                           ),
                         ],
                       ),
                     )
                   ],
                 ),
-              ),
-            )
-          ],
+              )
+            ],
+          ),
         ),
       ),
     );
