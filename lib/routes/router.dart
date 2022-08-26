@@ -7,8 +7,10 @@ import 'package:employeemanagement/screens/add_user.dart';
 import 'package:employeemanagement/screens/employee_details.dart';
 import 'package:employeemanagement/screens/forgot_password.dart';
 import 'package:employeemanagement/screens/login.dart';
+import 'package:employeemanagement/screens/login_conformation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
   switch (settings.name) {
@@ -29,7 +31,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case loginRoute:
       return _getPageRoute(const LoginScreen());
     default:
-      return _getPageRoute(Layout());
+      return _getPageRoute(LoginConformation());
   }
 }
 
@@ -37,4 +39,14 @@ PageRoute _getPageRoute(Widget child) {
   return MaterialPageRoute(
     builder: (context) => child,
   );
+}
+
+Future<bool> getLoginDetails() async {
+  SharedPreferences pref = await SharedPreferences.getInstance();
+  if (pref.getBool('login')!) {
+    return true;
+  } else {
+    return false;
+  }
+  // return pref.getBool('login');
 }

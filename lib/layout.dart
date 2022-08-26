@@ -9,10 +9,31 @@ import 'package:employeemanagement/helpers/responsive.dart';
 import 'package:employeemanagement/widgets/custom_text.dart';
 import 'package:employeemanagement/widgets/drawer.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Layout extends StatelessWidget {
-  GlobalKey<ScaffoldState> key = GlobalKey();
+class Layout extends StatefulWidget {
   Layout({Key? key}) : super(key: key);
+
+  @override
+  State<Layout> createState() => _LayoutState();
+}
+
+class _LayoutState extends State<Layout> {
+  GlobalKey<ScaffoldState> key = GlobalKey();
+  late SharedPreferences pref;
+  String name = '';
+  getSharedPrefData() async {
+    pref = await SharedPreferences.getInstance();
+    setState(() {
+      name = '${pref.getString('firstName')!} ${pref.getString('lastName')!}';
+    });
+  }
+
+  @override
+  void initState() {
+    getSharedPrefData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,9 +48,9 @@ class Layout extends StatelessWidget {
               children: [
                 Column(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: const [
+                  children: [
                     CustomText(
-                      text: "Rikin Patel",
+                      text: name,
                       size: 16,
                       fontfamily: "bold",
                     ),

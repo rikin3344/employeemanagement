@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:employeemanagement/constants/style.dart';
 import 'package:employeemanagement/controller/menu_controller.dart';
 import 'package:employeemanagement/controller/navigation_controller.dart';
@@ -7,6 +9,7 @@ import 'package:employeemanagement/routes/routes.dart';
 import 'package:employeemanagement/screens/login.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   Get.put(NavigationController());
@@ -14,23 +17,28 @@ void main() {
   runApp(const MyApp());
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends StatefulWidget {
   const MyApp({Key? key}) : super(key: key);
 
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       initialRoute: loginRoute,
       defaultTransition: Transition.rightToLeft,
       getPages: [
-        GetPage(name: loginRoute, page: () => LoginScreen()),
+        // GetPage(name: loginRoute, page: () => LoginScreen()),
         GetPage(
             name: rootRoute,
             page: () => localNavigator(),
             transition: Transition.rightToLeft)
       ],
       debugShowCheckedModeBanner: false,
-      title: "Devops CRMs",
+      title: "",
       theme: ThemeData(
         scaffoldBackgroundColor: colorBackground,
         fontFamily: 'Hanuman',

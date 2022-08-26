@@ -1,18 +1,16 @@
 import 'dart:io' show Platform;
+import 'package:employeemanagement/constants/controllers.dart';
+import 'package:employeemanagement/routes/routes.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:employeemanagement/constants/api_client.dart';
-import 'package:employeemanagement/constants/controllers.dart';
 import 'package:employeemanagement/constants/style.dart';
-import 'package:employeemanagement/controller/navigation_controller.dart';
 import 'package:employeemanagement/model/login_model.dart';
-import 'package:employeemanagement/routes/routes.dart';
 import 'package:employeemanagement/screens/forgot_password.dart';
 import 'package:employeemanagement/widgets/custom_edit_text.dart';
 import 'package:employeemanagement/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 import 'package:get/route_manager.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -26,6 +24,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool isObscureText = true;
   String email = '';
   String password = '';
+  late SharedPreferences pref;
 
   loginRequest(email, password, context) async {
     loading.start(context);
@@ -56,13 +55,48 @@ class _LoginScreenState extends State<LoginScreen> {
         body: data);
 
     if (response.statusCode == 200) {
-      LoginModel model = loginModelFromJson(response.body);
-      print(model.success);
+      try {
+        LoginModel model = loginModelFromJson(response.body);
+        pref.setString('userId', model.data.id);
+        pref.setBool("login", true);
+        pref.setString('companyId', model.data.companiesId);
+        pref.setString('firstName', model.data.firstName);
+        pref.setString('lastName', model.data.lastName);
+        pref.setString('email', model.data.email);
+        pref.setString('phoneNumber', model.data.phoneNumber);
+        pref.setString('profilePic', model.data.profilePic);
+        pref.setString('roleId', model.data.roleId);
+        pref.setString('addedBy', model.data.addedBy);
+        pref.setString('accountStatus', model.data.status);
+        pref.setString('accessToken', model.accessToken);
+
+        navigationController.navigateTO(homeRoute);
+        // Navigator.pushNamed(context, homeRoute);
+
+        // Get.offAll(ForgotPassword());
+      } catch (e) {
+        Get.snackbar(
+            "Invalid Credential!", 'Are you sure your details is valid!');
+      }
       loading.stopDialog(context);
     } else {
       print(response.statusCode);
       loading.stopDialog(context);
     }
+  }
+
+  setUpPrefData() async {
+    pref = await SharedPreferences.getInstance();
+    // print(pref.getBool('login')!);
+    // if (pref.getBool('login')!) {
+    //   navigationController.navigateTO(homeRoute);
+    // }
+  }
+
+  @override
+  void initState() {
+    setUpPrefData();
+    super.initState();
   }
 
   @override
@@ -198,7 +232,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                 } else {
                                   loginRequest(email, password, context);
                                 }
-                                // Get.offAllNamed(homeRoute);
                               },
                               child: const Icon(
                                 Icons.arrow_forward_ios_rounded,

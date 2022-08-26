@@ -7,15 +7,34 @@ import 'package:employeemanagement/constants/const.dart';
 import 'package:employeemanagement/constants/controllers.dart';
 import 'package:employeemanagement/constants/style.dart';
 import 'package:employeemanagement/helpers/menu_item.dart';
+import 'package:employeemanagement/main.dart';
 import 'package:employeemanagement/routes/routes.dart';
 import 'package:employeemanagement/widgets/custom_text.dart';
 import 'package:employeemanagement/widgets/horizontal_menu_item.dart';
 import 'package:employeemanagement/widgets/side_bar_selection_button.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class DrawerCustom extends StatelessWidget {
-  const DrawerCustom({Key? key}) : super(key: key);
+class DrawerCustom extends StatefulWidget {
+  DrawerCustom({Key? key}) : super(key: key);
+
+  @override
+  State<DrawerCustom> createState() => _DrawerCustomState();
+}
+
+class _DrawerCustomState extends State<DrawerCustom> {
+  late SharedPreferences pref;
+
+  getPrefData() async {
+    pref = await SharedPreferences.getInstance();
+  }
+
+  @override
+  void initState() {
+    getPrefData();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -152,7 +171,13 @@ class DrawerCustom extends StatelessWidget {
                                       ),
                                       FlatButton(
                                         onPressed: () {
-                                          Get.offAllNamed(loginRoute);
+                                          pref.setBool('login', false);
+                                          // Get.offAll(MyApp());
+                                          Navigator.of(context,
+                                                  rootNavigator: true)
+                                              .pop('dialog');
+                                          navigationController
+                                              .navigateTO(loginRoute);
                                         },
                                         child: const CustomText(
                                           text: "LOGOUT",
