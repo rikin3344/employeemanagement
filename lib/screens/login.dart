@@ -15,7 +15,9 @@ import 'package:get/route_manager.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({Key? key}) : super(key: key);
+  const LoginScreen({
+    Key? key,
+  }) : super(key: key);
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -90,10 +92,10 @@ class _LoginScreenState extends State<LoginScreen> {
 
   setUpPrefData() async {
     pref = await SharedPreferences.getInstance();
-    // print(pref.getBool('login')!);
-    // if (pref.getBool('login')!) {
-    //   navigationController.navigateTO(homeRoute);
-    // }
+    if (pref.getBool('login')!) {
+      pref.setBool('login', false);
+      Get.snackbar('Alert!', 'Login session expire!!');
+    }
   }
 
   @override

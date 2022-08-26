@@ -259,7 +259,7 @@ List<Widget> employeeList(List<Datum> data, width) {
             IconButton(
                 onPressed: () {
                   navigationController.navigateTO(
-                      employeeDetailsScreenRoute, {'employeeId': data[i].id});
+                      employeeDetailsScreenRoute, {'employeeId': data[i]});
                 },
                 icon: const Icon(
                   Icons.arrow_forward_ios_rounded,

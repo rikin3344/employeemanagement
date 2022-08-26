@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:employeemanagement/model/employee_details_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../model/employee_model.dart';
@@ -37,6 +38,29 @@ Future<EmployeesModel> getEmployee() async {
   if (response.statusCode == 200) {
     EmployeesModel employeeModel = employeesModelFromJson(response.body);
     return employeeModel;
+  } else {
+    throw Exception('Failed');
+  }
+}
+
+Future<EmployeeDetailsModel> getEmployeeDetails(employeeId) async {
+  SharedPreferences pref = await SharedPreferences.getInstance();
+  String userId = pref.getString('userId')!;
+  String deviceToken = pref.getString('deviceToken')!;
+  String accessToken = pref.getString('accessToken')!;
+  Map data = {'user_id': userId, 'device_token': deviceToken, 'id': employeeId};
+  var url = Uri.parse('${APiConst.baseUrl}edit-employee');
+  var response = await http.post(url,
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Authorization": '${APiConst.prefix}$accessToken'
+      },
+      body: data);
+  if (response.statusCode == 200) {
+    EmployeeDetailsModel employeeDetailsModel =
+        employeeDetailsModelFromJson(response.body);
+    return employeeDetailsModel;
   } else {
     throw Exception('Failed');
   }

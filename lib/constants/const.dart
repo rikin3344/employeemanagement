@@ -29,7 +29,7 @@ var iconFemale = [
   'assets/images/female_nine.png',
   'assets/images/female_ten.png',
 ];
-
+List<Datum> roleData = Datum(id: '', name: '', status: '') as List<Datum>;
 List<DatumCompany> companyData = DatumCompany(
     id: '',
     name: '',

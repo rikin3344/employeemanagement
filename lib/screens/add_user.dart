@@ -1,9 +1,17 @@
+import 'package:employeemanagement/constants/api_client.dart';
+import 'package:employeemanagement/constants/const.dart';
+import 'package:employeemanagement/constants/controllers.dart';
 import 'package:employeemanagement/constants/style.dart';
+import 'package:employeemanagement/model/add_user_model.dart';
+import 'package:employeemanagement/routes/routes.dart';
 import 'package:employeemanagement/widgets/custom_edit_text.dart';
 import 'package:employeemanagement/widgets/custom_text.dart';
+import 'package:employeemanagement/widgets/loding.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class AddUser extends StatefulWidget {
   const AddUser({Key? key}) : super(key: key);
@@ -15,9 +23,99 @@ class AddUser extends StatefulWidget {
 class _AddUserState extends State<AddUser> {
   String companySelect = 'Company';
   String roleSelect = 'Role';
-  var companyList = ['Company', 'xyz pvt ltd', 'TATA', 'Reliance'];
-  var role = ['Role', 'Manager', 'Employer', 'Contributor'];
+  var companyList = ['Company'];
+  var role = ['Role'];
+  Loading loading = Loading();
   List addedCompanyList = [];
+  String firstName = '';
+  String lastName = '';
+  String email = '';
+  String contact = '';
+  String companyId = '';
+  String roleId = '';
+
+  getCompanies(context) async {
+    loading.start(context);
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String userId = pref.getString('userId')!;
+    String deviceToken = pref.getString('deviceToken')!;
+    String accessToken = pref.getString('accessToken')!;
+    for (var i = 0; i < companyData.length; i++) {
+      if ('${companyData[i].name} (${companyData[i].code})' ==
+          addedCompanyList[0]) {
+        companyId = companyData[i].id;
+      }
+    }
+
+    for (var i = 0; i < roleData.length; i++) {
+      if (roleData[i].name == roleSelect) {
+        roleId = roleData[i].id;
+      }
+    }
+    // loading.stopDialog(context);
+    Map data = {
+      'user_id': userId,
+      'device_token': deviceToken,
+      'first_name': firstName,
+      'last_name': lastName,
+      'email': email,
+      'phone_number': contact,
+      'companies_id': companyId,
+      'role_id': roleId,
+    };
+    // print(userId);
+    // print(deviceToken);
+    // print(firstName);
+    // print(lastName);
+    // print(email);
+    // print(contact);
+    // print(companyId);
+    // print(roleId);
+    var url = Uri.parse("${APiConst.baseUrl}add-edit-user");
+    var response = await http.post(url,
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Authorization": '${APiConst.prefix}$accessToken'
+        },
+        body: data);
+    if (response.statusCode == 200) {
+      print(response.body);
+      AddUserModel model = addUserModelFromJson(response.body);
+      if (model.success || model.errorcode == '1') {
+        Get.snackbar("Added!", 'New User added Successfully!');
+        Future.delayed(
+          const Duration(seconds: 3),
+          () {
+            Navigator.pop(context);
+          },
+        );
+        loading.stopDialog(context);
+      } else {
+        Get.snackbar("Error!", model.message);
+        loading.stopDialog(context);
+      }
+    } else {
+      print(response.statusCode);
+      loading.stopDialog(context);
+      // throw Exception('Failed');
+    }
+  }
+
+  @override
+  void initState() {
+    for (var i = 0; i < roleData.length; i++) {
+      if (roleData[i].id == '25') {
+      } else {
+        role.add(roleData[i].name);
+      }
+    }
+    for (var i = 0; i < companyData.length; i++) {
+      companyList.add('${companyData[i].name} (${companyData[i].code})');
+    }
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     double width = MediaQuery.of(context).size.width;
@@ -63,14 +161,18 @@ class _AddUserState extends State<AddUser> {
                         label: "First Name",
                         width: width * 0.4,
                         onChange: (value) {
-                          print(value);
+                          setState(() {
+                            firstName = value;
+                          });
                         },
                       ),
                       CustomEditText(
                         label: "last Name",
                         width: width * 0.4,
                         onChange: (value) {
-                          print(value);
+                          setState(() {
+                            lastName = value;
+                          });
                         },
                       ),
                     ],
@@ -80,24 +182,29 @@ class _AddUserState extends State<AddUser> {
                     textInputType: TextInputType.emailAddress,
                     width: width * 0.9,
                     onChange: (value) {
-                      print(value);
+                      setState(() {
+                        email = value;
+                      });
                     },
                   ),
                   CustomEditText(
                     label: "Contact Number",
                     textInputType: TextInputType.number,
                     width: width * 0.9,
+                    maxLength: 10,
                     onChange: (value) {
-                      print(value);
+                      setState(() {
+                        contact = value;
+                      });
                     },
                   ),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        height: 50.0,
                         padding: const EdgeInsets.symmetric(horizontal: 10.0),
                         width: width * 0.65,
+                        height: 55,
                         decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(10),
                             border: Border.all(color: grayLight)),
@@ -117,9 +224,11 @@ class _AddUserState extends State<AddUser> {
                             items: companyList.map((String items) {
                               return DropdownMenuItem(
                                 value: items,
-                                child: CustomText(
-                                  text: items,
-                                  color: items == "Company" ? gray : black,
+                                child: Flexible(
+                                  child: CustomText(
+                                    text: items,
+                                    color: items == "Company" ? gray : black,
+                                  ),
                                 ),
                               );
                             }).toList(),
@@ -186,27 +295,32 @@ class _AddUserState extends State<AddUser> {
                             size: 18,
                           ),
                           Padding(
-                            padding: const EdgeInsets.only(left: 10.0),
-                            child: Row(
-                              children: [
-                                for (int i = 0;
-                                    i < addedCompanyList.length;
-                                    i++)
-                                  if (i == 0)
-                                    CustomText(
-                                      text: addedCompanyList[i],
-                                      fontfamily: 'medium',
-                                      color: black,
-                                      size: 14,
-                                    )
-                                  else
-                                    CustomText(
-                                      text: ", ${addedCompanyList[i]}",
-                                      fontfamily: 'medium',
-                                      color: black,
-                                      size: 14,
-                                    ),
-                              ],
+                            padding: const EdgeInsets.only(left: 0.0),
+                            child: Container(
+                              width: width,
+                              child: Wrap(
+                                children: [
+                                  for (int i = 0;
+                                      i < addedCompanyList.length;
+                                      i++)
+                                    if (i == 0)
+                                      CustomText(
+                                        text: addedCompanyList[i],
+                                        fontfamily: 'medium',
+                                        color: black,
+                                        size: 14,
+                                      )
+                                    else
+                                      Flexible(
+                                        child: CustomText(
+                                          text: ", ${addedCompanyList[i]}",
+                                          fontfamily: 'medium',
+                                          color: black,
+                                          size: 14,
+                                        ),
+                                      ),
+                                ],
+                              ),
                             ),
                           ),
                         ],
@@ -297,7 +411,25 @@ class _AddUserState extends State<AddUser> {
                                 borderRadius: BorderRadius.circular(71),
                               )),
                           clipBehavior: Clip.antiAliasWithSaveLayer,
-                          onPressed: () {},
+                          onPressed: () {
+                            // print(firstName);
+                            // print(lastName);
+                            // print(email);
+                            // print(contact);
+                            // print(addedCompanyList);
+                            // print(roleSelect);
+                            if (firstName == '' ||
+                                lastName == '' ||
+                                email == '' ||
+                                contact == '' ||
+                                addedCompanyList.isEmpty ||
+                                (roleSelect == '' || roleSelect == 'Role')) {
+                              Get.snackbar('Field Required!!',
+                                  'All fields are required!!');
+                            } else {
+                              getCompanies(context);
+                            }
+                          },
                           child: const Icon(
                             Icons.download_done_rounded,
                             size: 35,

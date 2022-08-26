@@ -32,7 +32,7 @@ Route<dynamic> generateRoute(RouteSettings settings) {
     case forgotPassScreenRoute:
       return _getPageRoute(const ForgotPassword());
     case loginRoute:
-      return _getPageRoute(const LoginScreen());
+      return _getPageRoute(LoginScreen());
     default:
       return _getPageRoute(LoginConformation());
   }

@@ -1,8 +1,16 @@
+import 'package:employeemanagement/constants/api_client.dart';
+import 'package:employeemanagement/constants/controllers.dart';
 import 'package:employeemanagement/constants/style.dart';
+import 'package:employeemanagement/model/add_company_model.dart';
+import 'package:employeemanagement/routes/routes.dart';
 import 'package:employeemanagement/widgets/custom_edit_text.dart';
 import 'package:employeemanagement/widgets/custom_text.dart';
+import 'package:employeemanagement/widgets/loding.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:iconsax/iconsax.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class AddCompany extends StatefulWidget {
   const AddCompany({Key? key}) : super(key: key);
@@ -39,13 +47,70 @@ class _AddCompanyState extends State<AddCompany> {
   }
 }
 
-class PersonalDetailsWidget extends StatelessWidget {
+class PersonalDetailsWidget extends StatefulWidget {
   const PersonalDetailsWidget({
     Key? key,
     required this.width,
   }) : super(key: key);
 
   final double width;
+
+  @override
+  State<PersonalDetailsWidget> createState() => _PersonalDetailsWidgetState();
+}
+
+class _PersonalDetailsWidgetState extends State<PersonalDetailsWidget> {
+  String companyName = '';
+  String contactPersonName = '';
+  String email = '';
+  String contact = '';
+  Loading loading = Loading();
+
+  getCompanies(context) async {
+    loading.start(context);
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    String userId = pref.getString('userId')!;
+    String deviceToken = pref.getString('deviceToken')!;
+    String accessToken = pref.getString('accessToken')!;
+    Map data = {
+      'user_id': userId,
+      'device_token': deviceToken,
+      'name': companyName,
+      'contact_person': contactPersonName,
+      'email': email,
+      'contact_number': contact
+    };
+    var url = Uri.parse("${APiConst.baseUrl}add-edit-company");
+    var response = await http.post(url,
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
+          "Authorization": '${APiConst.prefix}$accessToken'
+        },
+        body: data);
+    if (response.statusCode == 200) {
+      AddCompanyModel model = addCompanyModelFromJson(response.body);
+      if (model.success || model.errorcode == '1') {
+        Get.snackbar("Added!", 'New Company added Successfully!');
+        Future.delayed(
+          const Duration(seconds: 3),
+          () {
+            // navigationController.navigateTO(homeRoute, []);
+
+            Navigator.pop(context);
+          },
+        );
+        loading.stopDialog(context);
+      } else {
+        Get.snackbar("Error!", model.message);
+        loading.stopDialog(context);
+      }
+    } else {
+      print(response.statusCode);
+      loading.stopDialog(context);
+      // throw Exception('Failed');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,37 +126,46 @@ class PersonalDetailsWidget extends StatelessWidget {
                 fontfamily: "bold",
                 color: colorPrimary,
               ),
-              SizedBox(
+              const SizedBox(
                 height: 20.0,
               ),
               CustomEditText(
                 label: "Company Name",
-                width: width * 0.9,
+                width: widget.width * 0.9,
                 onChange: (value) {
-                  print(value);
+                  setState(() {
+                    companyName = value;
+                  });
                 },
               ),
               CustomEditText(
                 label: "Contact Person Name",
-                width: width * 0.9,
+                width: widget.width * 0.9,
                 onChange: (value) {
-                  print(value);
+                  setState(() {
+                    contactPersonName = value;
+                  });
                 },
               ),
               CustomEditText(
                 label: "Email Address",
                 textInputType: TextInputType.emailAddress,
-                width: width * 0.9,
+                width: widget.width * 0.9,
                 onChange: (value) {
-                  print(value);
+                  setState(() {
+                    email = value;
+                  });
                 },
               ),
               CustomEditText(
                 label: "Contact Number",
+                maxLength: 10,
                 textInputType: TextInputType.number,
-                width: width * 0.9,
+                width: widget.width * 0.9,
                 onChange: (value) {
-                  print(value);
+                  setState(() {
+                    contact = value;
+                  });
                 },
               ),
               // CustomEditText(
@@ -102,7 +176,7 @@ class PersonalDetailsWidget extends StatelessWidget {
               //   },
               // ),
               Container(
-                width: width * 0.9,
+                width: widget.width * 0.9,
                 height: 130,
                 padding: const EdgeInsets.symmetric(horizontal: 20.0),
                 decoration: BoxDecoration(
@@ -149,7 +223,17 @@ class PersonalDetailsWidget extends StatelessWidget {
                             borderRadius: BorderRadius.circular(71),
                           )),
                       clipBehavior: Clip.antiAliasWithSaveLayer,
-                      onPressed: () {},
+                      onPressed: () {
+                        if (companyName == '' ||
+                            contactPersonName == '' ||
+                            email == '' ||
+                            contact == '') {
+                          Get.snackbar(
+                              "Field Required!", 'All fields are required!!');
+                        } else {
+                          getCompanies(context);
+                        }
+                      },
                       child: const Icon(
                         Icons.download_done_rounded,
                         size: 35,

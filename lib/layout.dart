@@ -1,5 +1,7 @@
 import 'dart:math';
+import 'package:employeemanagement/constants/controllers.dart';
 import 'package:employeemanagement/model/company_model.dart';
+import 'package:employeemanagement/routes/routes.dart';
 import 'package:http/http.dart' as http;
 import 'package:employeemanagement/constants/api_client.dart';
 import 'package:employeemanagement/constants/const.dart';
@@ -62,15 +64,25 @@ class _LayoutState extends State<Layout> {
         },
         body: data);
     if (response.statusCode == 200) {
-      RoleModel model = roleModelFromJson(response.body);
-      for (var i = 0; i < model.data.length; i++) {
-        if (model.data[i].id == roleId) {
-          setState(() {
-            roleName = model.data[i].name;
-          });
+      try {
+        RoleModel model = roleModelFromJson(response.body);
+        setState(() {
+          roleData = model.data;
+        });
+        for (var i = 0; i < model.data.length; i++) {
+          if (model.data[i].id == roleId) {
+            setState(() {
+              roleName = model.data[i].name;
+            });
+          }
         }
+      } catch (e) {
+        navigationController.navigateTO(loginRoute, [
+          {'message': "Session Expire!!"}
+        ]);
       }
     } else {
+      navigationController.navigateTO(loginRoute, []);
       print(response.statusCode);
       // throw Exception('Failed');
     }
@@ -88,14 +100,18 @@ class _LayoutState extends State<Layout> {
         },
         body: data);
     if (response.statusCode == 200) {
-      CompanyModel model = companyModelFromJson(response.body);
-      // print(model.message);
-      setState(() {
-        companyData = model.data;
-        print(companyData[0].email);
-      });
+      try {
+        CompanyModel model = companyModelFromJson(response.body);
+        // print(model.message);
+        setState(() {
+          companyData = model.data;
+          print(companyData[0].email);
+        });
+      } catch (e) {
+        navigationController.navigateTO(loginRoute, []);
+      }
     } else {
-      print(response.statusCode);
+      navigationController.navigateTO(loginRoute, []);
       // throw Exception('Failed');
     }
   }
