@@ -177,7 +177,7 @@ class _DrawerCustomState extends State<DrawerCustom> {
                                                   rootNavigator: true)
                                               .pop('dialog');
                                           navigationController
-                                              .navigateTO(loginRoute);
+                                              .navigateTO(loginRoute, []);
                                         },
                                         child: const CustomText(
                                           text: "LOGOUT",

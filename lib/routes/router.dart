@@ -13,11 +13,14 @@ import 'package:get/get.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings) {
+  final arguments = settings.arguments;
   switch (settings.name) {
     case homeRoute:
       return _getPageRoute(Layout());
     case employeeDetailsScreenRoute:
-      return _getPageRoute(const EmployeeDetailsScreen());
+      return _getPageRoute(EmployeeDetailsScreen(
+        arguments: arguments as Map<dynamic, dynamic>,
+      ));
     case addCompanyScreenRoute:
       return _getPageRoute(const AddCompany());
     case addManagerScreenRoute:
@@ -39,14 +42,4 @@ PageRoute _getPageRoute(Widget child) {
   return MaterialPageRoute(
     builder: (context) => child,
   );
-}
-
-Future<bool> getLoginDetails() async {
-  SharedPreferences pref = await SharedPreferences.getInstance();
-  if (pref.getBool('login')!) {
-    return true;
-  } else {
-    return false;
-  }
-  // return pref.getBool('login');
 }

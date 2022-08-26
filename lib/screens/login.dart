@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 import 'package:employeemanagement/constants/controllers.dart';
 import 'package:employeemanagement/routes/routes.dart';
+import 'package:employeemanagement/widgets/loding.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:employeemanagement/constants/api_client.dart';
@@ -25,6 +26,7 @@ class _LoginScreenState extends State<LoginScreen> {
   String email = '';
   String password = '';
   late SharedPreferences pref;
+  Loading loading = Loading();
 
   loginRequest(email, password, context) async {
     loading.start(context);
@@ -69,8 +71,9 @@ class _LoginScreenState extends State<LoginScreen> {
         pref.setString('addedBy', model.data.addedBy);
         pref.setString('accountStatus', model.data.status);
         pref.setString('accessToken', model.accessToken);
+        pref.setString('deviceToken', deviceToken);
 
-        navigationController.navigateTO(homeRoute);
+        navigationController.navigateTO(homeRoute, []);
         // Navigator.pushNamed(context, homeRoute);
 
         // Get.offAll(ForgotPassword());

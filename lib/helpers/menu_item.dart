@@ -14,17 +14,17 @@ class MenuItem {
 
 List<MenuItem> sideMenuItems = [
   MenuItem(dashboardDetailsScreenRoute, dashboardDetailsScreen, () {
-    navigationController.navigateTO(dashboardDetailsScreenRoute);
+    navigationController.navigateTO(dashboardDetailsScreenRoute, []);
   }),
   MenuItem(addCompanyScreenRoute, addCompanyScreen, () {
-    navigationController.navigateTO(addCompanyScreenRoute);
+    navigationController.navigateTO(addCompanyScreenRoute, []);
   }),
   MenuItem(addManagerScreenRoute, addManagerScreen, () {
-    navigationController.navigateTO(addManagerScreenRoute);
+    navigationController.navigateTO(addManagerScreenRoute, []);
   }),
   // MenuItem(addEmployerScreenRoute, addEmployerScreen, () {}),
   MenuItem(addEmployeeScreenRoute, addEmployeeScreen, () {
-    navigationController.navigateTO(addEmployeeScreenRoute);
+    navigationController.navigateTO(addEmployeeScreenRoute, []);
   }),
   MenuItem(notificationScreenRoute, notificationScreen, () {}),
 ];

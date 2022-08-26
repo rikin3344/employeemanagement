@@ -16,11 +16,11 @@ class _LoginConformationState extends State<LoginConformation> {
   late SharedPreferences pref;
   setUpPrefData() async {
     pref = await SharedPreferences.getInstance();
-    print(pref.getBool('login')!);
-    if (pref.getBool('login')!) {
-      navigationController.navigateTO(homeRoute);
+    // print(pref.getBool('login')!);
+    if (((pref.getBool('login')) ?? false)) {
+      navigationController.navigateTO(homeRoute, []);
     } else {
-      navigationController.navigateTO(loginRoute);
+      navigationController.navigateTO(loginRoute, []);
     }
   }
 

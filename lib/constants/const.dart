@@ -1,3 +1,5 @@
+import 'package:employeemanagement/model/company_model.dart';
+import 'package:employeemanagement/model/role_model.dart';
 import 'package:employeemanagement/routes/router.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -27,3 +29,14 @@ var iconFemale = [
   'assets/images/female_nine.png',
   'assets/images/female_ten.png',
 ];
+
+List<DatumCompany> companyData = DatumCompany(
+    id: '',
+    name: '',
+    code: '',
+    status: '',
+    contactPerson: '',
+    email: '',
+    contactNumber: '',
+    logo: '',
+    addedBy: '') as List<DatumCompany>;

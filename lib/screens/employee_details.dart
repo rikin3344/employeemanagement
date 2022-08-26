@@ -6,7 +6,9 @@ import 'package:employeemanagement/widgets/custom_text.dart';
 import 'package:flutter/material.dart';
 
 class EmployeeDetailsScreen extends StatefulWidget {
-  const EmployeeDetailsScreen({Key? key}) : super(key: key);
+  final Map<dynamic, dynamic> arguments;
+  const EmployeeDetailsScreen({Key? key, required this.arguments})
+      : super(key: key);
 
   @override
   State<EmployeeDetailsScreen> createState() => _EmployeeDetailsStateScreen();
@@ -19,6 +21,7 @@ class _EmployeeDetailsStateScreen extends State<EmployeeDetailsScreen>
   bool checkBox = false;
   @override
   void initState() {
+    print(widget.arguments.toString());
     _tabController = TabController(length: 2, vsync: this);
     super.initState();
   }
